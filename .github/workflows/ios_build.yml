@@ -70,16 +70,6 @@ jobs:
                 config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
                 config.build_settings['SWIFT_VERSION'] = '5.0'
                 config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
-                config.build_settings['HEADER_SEARCH_PATHS'] ||= '$(inherited)'
-                config.build_settings['HEADER_SEARCH_PATHS'] << ' $(PROJECT_DIR)/Flutter'
-                config.build_settings['HEADER_SEARCH_PATHS'] << ' $(PROJECT_DIR)/Flutter/Flutter.framework/Headers'
-                config.build_settings['HEADER_SEARCH_PATHS'] << ' $(PROJECT_DIR)/Flutter/Flutter.xcframework/ios-arm64/Flutter.framework/Headers'
-                config.build_settings['HEADER_SEARCH_PATHS'] << ' $(PROJECT_DIR)/Flutter/Flutter.xcframework/ios-arm64_x86_64-simulator/Flutter.framework/Headers'
-                config.build_settings['HEADER_SEARCH_PATHS'] << '$(PROJECT_DIR)/Flutter/Flutter.xcframework/ios-arm64/Flutter.framework/Modules'
-                config.build_settings['HEADER_SEARCH_PATHS'] << '$(PROJECT_DIR)/Flutter/Flutter.xcframework/ios-arm64_x86_64-simulator/Flutter.framework/Modules'
-                config.build_settings['HEADER_SEARCH_PATHS'] << ' $(FLUTTER_ROOT)/bin/cache/artifacts/engine/ios-release/Flutter.xcframework/ios-arm64/Flutter.framework/Headers'
-                config.build_settings['FRAMEWORK_SEARCH_PATHS'] ||= '$(inherited)'
-                config.build_settings['FRAMEWORK_SEARCH_PATHS'] << ' $(PROJECT_DIR)/Flutter'
               end
             end
             flutter_post_install(installer) if defined?(flutter_post_install)
