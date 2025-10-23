@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "799945204583",
+    "project_id": "lonchiinggd",
+    "storage_bucket": "lonchiinggd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:799945204583:android:5bd80268db25d8ede445c2",
+        "android_client_info": {
+          "package_name": "com.lonchi_ing.lonchi_ing_gd"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "799945204583-6ouge5thi53ocpjpogf96icv9jagm7mp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.lonchi_ing.lonchi_ing_gd",
+            "certificate_hash": "7b4637976a78acfb8505fcbec5ebc6eaf6764318"
+          }
+        },
+        {
+          "client_id": "799945204583-mkf5ba1qm155hnvbloqok2epbpn81n09.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBla2OQdoqQFenPYqeRL0ZAb54Su_9GxF4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "799945204583-mkf5ba1qm155hnvbloqok2epbpn81n09.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

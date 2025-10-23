@@ -1,0 +1,55 @@
+name: Simple build iOS IPA (unsigned)
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-ios:
+    runs-on: macos-latest
+
+    steps:
+      # 1. Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Setup Flutter
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.35.6
+
+      # 3. Precache iOS artifacts
+      - name: Precache Flutter iOS artifacts
+        run: flutter precache --ios
+
+      # 4. Clean project & dependencies
+      - name: Clean Flutter project
+        run: |
+          flutter clean
+          rm -rf ios/Pods ios/Podfile.lock pubspec.lock
+          flutter pub cache repair
+
+      # 5. Get Flutter dependencies
+      - name: Get dependencies
+        run: flutter pub get
+
+      # 6. Install CocoaPods
+      - name: Install CocoaPods
+        working-directory: ios
+        run: |
+          pod repo update
+          pod install --repo-update
+
+      # 7. Build unsigned IPA
+      - name: Build unsigned iOS IPA
+        run: flutter build ipa --no-codesign --verbose
+
+      # 8. Upload IPA as artifact
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: unsigned-ipa
+          path: build/ios/ipa/*.ipa

@@ -1,0 +1,33 @@
+workflows:
+  build-unsigned-ipa:
+    name: Build unsigned iOS IPA
+    max_build_duration: 60
+    environment:
+      flutter: stable
+      xcode: latest
+      cocoapods: default
+      vars:
+        FLUTTER_BUILD_DIR: build
+      ios_signing:
+        distribution_type: ad_hoc
+        bundle_identifier: com.lonchi_ing.lonchi_ing_gd
+    scripts:
+      - name: Get Flutter dependencies
+        script: flutter pub get
+
+      - name: Update iOS deployment target
+        script: |
+          cd ios
+          if [ -f "Podfile" ]; then
+            sed -i '' 's/platform :ios, .*/platform :ios, '15.0'/' Podfile || echo "platform :ios, '15.0'" >> Podfile
+          else
+            echo "platform :ios, '15.0'" > Podfile
+          fi
+          cd ..
+
+      - name: Build iOS IPA (unsigned)
+        script: |
+          flutter build ipa --no-codesign
+
+    artifacts:
+      - build/ios/ipa/*.ipa
