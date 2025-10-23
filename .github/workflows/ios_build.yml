@@ -43,43 +43,7 @@ jobs:
         run: |
           flutter pub get
 
-      #6. Prepare iOS Flutter framework
-      - name: Prepare Flutter iOS framework
-        run: |
-          mkdir -p ios/Flutter
-
-          ENGINE_DIR="$FLUTTER_ROOT/bin/cache/artifacts/engine"
-          if [ -d "$ENGINE_DIR/ios-release/Flutter.xcframework" ]; then
-            echo "Using Flutter.xcframework from ios-release"
-            cp -R "$ENGINE_DIR/ios-release/Flutter.xcframework" ios/Flutter/
-          elif [ -d "$ENGINE_DIR/ios/Flutter.xcframework" ]; then
-            echo "Using Flutter.xcframework from ios"
-            cp -R "$ENGINE_DIR/ios/Flutter.xcframework" ios/Flutter/
-          elif [ -d "$ENGINE_DIR/ios/Flutter.framework" ]; then
-            echo "Using legacy Flutter.framework"
-            cp -R "$ENGINE_DIR/ios/Flutter.framework" ios/Flutter/
-          else
-            echo "❌ Could not find Flutter.framework or Flutter.xcframework!"
-            ls -R "$ENGINE_DIR"
-            exit 1
-          fi
-          
-          if [ -d "$ENGINE_DIR/ios/extension_safe/Flutter.xcframework" ]; then
-            echo "Copying extension_safe Flutter.xcframework"
-            cp -R "$ENGINE_DIR/ios/extension_safe/Flutter.xcframework" ios/Flutter/Flutter_extension_safe.xcframework
-          fi
-
-          if [ -f "$ENGINE_DIR/ios/Flutter.podspec" ]; then
-            cp "$ENGINE_DIR/ios/Flutter.podspec" ios/Flutter/
-          elif [ -f "$ENGINE_DIR/ios-release/Flutter.podspec" ]; then
-            cp "$ENGINE_DIR/ios-release/Flutter.podspec" ios/Flutter/
-          else
-            echo "⚠️ Flutter.podspec not found; continuing anyway."
-          fi
-          
-          echo "✅ Flutter frameworks prepared under ios/Flutter"
-
-      #7. Create Podfile if missing
+      #6. Create Podfile if missing
       - name: Create Podfile for CI
         run: |
           mkdir -p ios
@@ -111,6 +75,8 @@ jobs:
                 config.build_settings['HEADER_SEARCH_PATHS'] << ' $(PROJECT_DIR)/Flutter/Flutter.framework/Headers'
                 config.build_settings['HEADER_SEARCH_PATHS'] << ' $(PROJECT_DIR)/Flutter/Flutter.xcframework/ios-arm64/Flutter.framework/Headers'
                 config.build_settings['HEADER_SEARCH_PATHS'] << ' $(PROJECT_DIR)/Flutter/Flutter.xcframework/ios-arm64_x86_64-simulator/Flutter.framework/Headers'
+                config.build_settings['HEADER_SEARCH_PATHS'] << '$(PROJECT_DIR)/Flutter/Flutter.xcframework/ios-arm64/Flutter.framework/Modules'
+                config.build_settings['HEADER_SEARCH_PATHS'] << '$(PROJECT_DIR)/Flutter/Flutter.xcframework/ios-arm64_x86_64-simulator/Flutter.framework/Modules'
                 config.build_settings['HEADER_SEARCH_PATHS'] << ' $(FLUTTER_ROOT)/bin/cache/artifacts/engine/ios-release/Flutter.xcframework/ios-arm64/Flutter.framework/Headers'
                 config.build_settings['FRAMEWORK_SEARCH_PATHS'] ||= '$(inherited)'
                 config.build_settings['FRAMEWORK_SEARCH_PATHS'] << ' $(PROJECT_DIR)/Flutter'
@@ -131,12 +97,12 @@ jobs:
         env:
           COCOAPODS_DISABLE_STATS: 'true'
 
-      #7b. Check Wakelock headers include path
+      #8. Check Wakelock headers include path
       - name: Check Wakelock headers include path
         run: |
           grep -R "HEADER_SEARCH_PATHS" ios/Pods/Pods.xcodeproj/project.pbxproj | head -n 30
 
-      #8. Show pod & engine artifacts state (debug)
+      #9. Show pod & engine artifacts state (debug)
       - name: Show pod & engine artifacts state (debug)
         run: |
           echo "Podfile:"
