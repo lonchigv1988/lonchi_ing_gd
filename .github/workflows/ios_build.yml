@@ -65,14 +65,16 @@ jobs:
       
           post_install do |installer|
             installer.pods_project.targets.each do |target|
-            puts "Configuring pod target: #{target.name}"
               target.build_configurations.each do |config|
                 config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
                 config.build_settings['SWIFT_VERSION'] = '5.0'
                 config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
+                config.build_settings['HEADER_SEARCH_PATHS'] ||= '$(inherited)'
+                config.build_settings['HEADER_SEARCH_PATHS'] << ' $(PROJECT_DIR)/Flutter'
+                config.build_settings['HEADER_SEARCH_PATHS'] << ' $(PROJECT_DIR)/Flutter/Flutter.framework/Headers'
               end
             end
-            flutter_post_install(installer) if defined?(flutter_post_install)
+            flutter_post_install(installer)
           end
           EOF
           echo "Podfile written to ios/Podfile"
@@ -86,30 +88,21 @@ jobs:
           pod install --repo-update
         env:
           COCOAPODS_DISABLE_STATS: 'true'
-          FLUTTER_ROOT: ${{ runner.tool_cache }}/flutter/stable-3.35.6-x64
+          FLUTTER_ROOT: /Users/runner/hostedtoolcache/flutter/stable-3.35.6-x64
 
-      #8. Check Wakelock headers include path
-      - name: Check Wakelock headers include path
+      #8 Optional debug: show Pods and Flutter engine
+      - name: Show pod & engine artifacts state
         run: |
-          grep -R "HEADER_SEARCH_PATHS" ios/Pods/Pods.xcodeproj/project.pbxproj | head -n 30
-
-      #9. Show pod & engine artifacts state (debug)
-      - name: Show pod & engine artifacts state (debug)
-        run: |
-          echo "Podfile:"
-          sed -n '1,200p' ios/Podfile || true
-          echo "---- Podfile.lock head ----"
-          head -n 60 ios/Podfile.lock || true
-          echo "---- Flutter engine folder ----"
-          ls -al $FLUTTER_ROOT/bin/cache/artifacts/engine/ios || true
           echo "---- Pods installed ----"
           ls -al ios/Pods || true
+          echo "---- Flutter engine folder ----"
+          ls -al $FLUTTER_ROOT/bin/cache/artifacts/engine/ios || true
 
-      #10. Build unsigned iOS IPA
+      #9. Build unsigned iOS IPA
       - name: Build unsigned iOS IPA
         run: flutter build ipa --no-codesign
 
-      #11. Upload IPA as artifact
+      #10. Upload IPA as artifact
       - name: Upload IPA
         uses: actions/upload-artifact@v4
         with:
