@@ -86,6 +86,7 @@ jobs:
           pod install --repo-update
         env:
           COCOAPODS_DISABLE_STATS: 'true'
+          FLUTTER_ROOT: ${{ runner.tool_cache }}/flutter/stable-3.35.6-x64
 
       #8. Check Wakelock headers include path
       - name: Check Wakelock headers include path
