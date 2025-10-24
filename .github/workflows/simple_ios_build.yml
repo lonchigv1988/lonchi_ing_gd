@@ -7,18 +7,24 @@ jobs:
   build-ios-ipa:
     name: 🎉 iOS Build
     runs-on: macos-latest
-
     steps:
       - uses: actions/checkout@v3
 
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
+      - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
           architecture: x64
 
       - name: Get Flutter dependencies
         run: flutter pub get
+
+      - name: Setup Bundler and CocoaPods 1.16.2
+        run: |
+          sudo gem install bundler
+          echo "source 'https://rubygems.org'" > Gemfile
+          echo "gem 'cocoapods', '1.16.2'" >> Gemfile
+          bundle install
+          bundle exec pod --version
 
       - name: Ensure Podfile sets iOS 15.0
         run: |
@@ -54,32 +60,24 @@ jobs:
         run: |
           rm -rf ios/Pods ios/Podfile.lock ios/Flutter/Flutter.framework ios/Flutter/Flutter.xcframework
 
-      - name: Precache Flutter artifacts
-        run: flutter precache --ios
-
       - name: Install CocoaPods dependencies
         working-directory: ios
-        run: |
-          pod repo update
-          pod install --verbose
+        run: bundle exec pod install
 
       - name: Build iOS IPA (no code sign)
         run: |
           flutter clean
           flutter pub get
-          flutter build ipa --no-codesign
+          flutter build ipa --no-codesign --verbose
 
-      - name: Prepare IPA payload
-        working-directory: build/ios/iphoneos
+      - name: Prepare IPA
         run: |
-          mkdir Payload
-          mv Runner.app Payload
+          mkdir -p build/ios/iphoneos/Payload
+          mv build/ios/iphoneos/Runner.app build/ios/iphoneos/Payload/
+          cd build/ios/iphoneos
+          zip -qq -r -9 FlutterIpaExport.ipa Payload
 
-      - name: Create IPA archive
-        working-directory: build/ios/iphoneos
-        run: zip -qq -r -9 FlutterIpaExport.ipa Payload
-
-      - name: Upload binaries to release
+      - name: Upload IPA to release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
