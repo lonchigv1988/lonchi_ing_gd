@@ -7,15 +7,18 @@ jobs:
   build-ios-ipa:
     name: 🎉 iOS Build
     runs-on: macos-latest
+
     steps:
       - uses: actions/checkout@v3
 
-      - uses: subosito/flutter-action@v2
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
           architecture: x64
-      - run: flutter pub get
 
+      - name: Get Flutter dependencies
+        run: flutter pub get
 
       - name: Ensure Podfile sets iOS 15.0
         run: |
@@ -47,20 +50,34 @@ jobs:
           EOF
           echo "✅ Podfile created for iOS 15.0"
 
-      - run: pod repo update
+      - name: Clean iOS Pods
+        run: |
+          rm -rf ios/Pods ios/Podfile.lock ios/Flutter/Flutter.framework ios/Flutter/Flutter.xcframework
+
+      - name: Precache Flutter artifacts
+        run: flutter precache --ios
+
+      - name: Install CocoaPods dependencies
         working-directory: ios
+        run: |
+          pod repo update
+          pod install --verbose
 
-      - run: flutter build ios --release --no-codesign
+      - name: Build iOS IPA (no code sign)
+        run: |
+          flutter clean
+          flutter pub get
+          flutter build ipa --no-codesign --verbose
 
-      - run: mkdir Payload
+      - name: Prepare IPA payload
         working-directory: build/ios/iphoneos
+        run: |
+          mkdir Payload
+          mv Runner.app Payload
 
-      - run: mv Runner.app/ Payload
+      - name: Create IPA archive
         working-directory: build/ios/iphoneos
-
-      - name: Zip output
         run: zip -qq -r -9 FlutterIpaExport.ipa Payload
-        working-directory: build/ios/iphoneos
 
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
