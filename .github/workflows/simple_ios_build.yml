@@ -67,7 +67,7 @@ jobs:
         run: |
           flutter clean
           flutter pub get
-          flutter build ipa --no-codesign --verbose
+          flutter build ipa --no-codesign
 
       - name: Prepare IPA payload
         working-directory: build/ios/iphoneos
