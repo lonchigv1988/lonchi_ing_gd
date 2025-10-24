@@ -3,9 +3,6 @@ name: Build iOS IPA (unsigned)
 # Trigger manually or on push to main branch
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
 
 jobs:
   build-ios:
