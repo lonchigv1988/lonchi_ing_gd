@@ -71,7 +71,7 @@ jobs:
       - name: Prepare IPA
         run: |
           mkdir -p build/ios/iphoneos/Payload
-          mv build/ios/iphoneos/Runner.app build/ios/iphoneos/Payload/
+          cp -R build/ios/archive/Runner.xcarchive/Products/Applications/Runner.app build/ios/iphoneos/Payload/
           cd build/ios/iphoneos
           zip -qq -r -9 FlutterIpaExport.ipa Payload
 
