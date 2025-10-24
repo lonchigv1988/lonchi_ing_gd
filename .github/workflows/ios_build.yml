@@ -74,7 +74,7 @@ jobs:
                 config.build_settings['HEADER_SEARCH_PATHS'] << ' $(PROJECT_DIR)/Flutter/Flutter.framework/Headers'
               end
             end
-            flutter_post_install(installer)
+            flutter_post_install(installer) if defined?(flutter_post_install)
           end
           EOF
           echo "Podfile written to ios/Podfile"
